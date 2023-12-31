@@ -6,6 +6,7 @@ import './globals.css'
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import 'react-loading-skeleton/dist/skeleton.css'
 import 'simplebar-react/dist/simplebar.min.css'
+import { Analytics } from '@vercel/analytics/react';
 
 import { Toaster } from '@/components/ui/toaster'
 import { Footer } from '@/components/ui/footer'
@@ -31,6 +32,7 @@ export default function RootLayout({
           <Navbar />
           {children}
           <SpeedInsights />
+          <Analytics />
 
         </body>
       </Providers>
