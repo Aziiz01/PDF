@@ -9,7 +9,7 @@ import {
 import { ArrowRight } from 'lucide-react'
 import UserAccountNav from './UserAccountNav'
 import MobileNav from './MobileNav'
-
+import Image from 'next/image'
 const Navbar = () => {
   const { getUser } = getKindeServerSession()
   const user = getUser()
@@ -20,10 +20,11 @@ const Navbar = () => {
         <div className='flex h-14 items-center justify-between border-b border-zinc-200'>
           <Link
             href='/'
-            className='flex z-40 font-semibold'>
-            <span>quill.</span>
+            className='flex z-40 font-semibold items-center'>
+              <Image height={20} width={20} alt="Logo" src="/favicon.ico" />
+                  <span className='ml-1'>PDFSnap</span>
           </Link>
-
+        
           <MobileNav isAuth={!!user} />
 
           <div className='hidden items-center space-x-4 sm:flex'>

@@ -3,6 +3,8 @@ import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import { buttonVariants } from '@/components/ui/button'
 import Image from 'next/image'
+import { Stars } from '@/components/ui/stars'
+import { Footer } from '@/components/ui/footer'
 
 export default function Home() {
   return (
@@ -10,7 +12,7 @@ export default function Home() {
       <MaxWidthWrapper className='mb-12 mt-28 sm:mt-40 flex flex-col items-center justify-center text-center'>
         <div className='mx-auto mb-4 flex max-w-fit items-center justify-center space-x-2 overflow-hidden rounded-full border border-gray-200 bg-white px-7 py-2 shadow-md backdrop-blur transition-all hover:border-gray-300 hover:bg-white/50'>
           <p className='text-sm font-semibold text-gray-700'>
-            Quill is now public!
+          PDFSnap is now public!
           </p>
         </div>
         <h1 className='max-w-4xl text-5xl font-bold md:text-6xl lg:text-7xl'>
@@ -19,7 +21,7 @@ export default function Home() {
           in seconds.
         </h1>
         <p className='mt-5 max-w-prose text-zinc-700 sm:text-lg'>
-          Quill allows you to have conversations with any
+        PDFSnap allows you to have conversations with any
           PDF document. Simply upload your file and start
           asking questions right away.
         </p>
@@ -91,7 +93,7 @@ export default function Home() {
             </h2>
             <p className='mt-4 text-lg text-gray-600'>
               Chatting to your PDF files has never been
-              easier than with Quill.
+              easier than with PDFSnap.
             </p>
           </div>
         </div>
@@ -141,7 +143,7 @@ export default function Home() {
                 Start asking questions
               </span>
               <span className='mt-2 text-zinc-700'>
-                It&apos;s that simple. Try out Quill today -
+                It&apos;s that simple. Try out PDFSnap today -
                 it really takes less than a minute.
               </span>
             </div>
@@ -162,7 +164,84 @@ export default function Home() {
             </div>
           </div>
         </div>
+        <div className='mx-auto mb-32 mt-32 max-w-5xl sm:mt-56'>
+        <div className='mb-12 px-6 lg:px-8'>
+          <div className='mx-auto max-w-2xl sm:text-center'>
+            <h2 className='mt-2 font-bold text-4xl text-gray-900 sm:text-5xl'>
+             Our Happy Customers!
+            </h2>
+           
+          </div>
+        </div>
+        
+    <div className="grid mb-8 border mt-11 border-gray-200 rounded-lg shadow-sm dark:border-gray-700 md:mb-12 md:grid-cols-2" style={{ backgroundColor: '#ADD8E6' }}>
+    <figure className="flex flex-col items-center justify-center p-8 text-center bg-white border-b border-gray-200 rounded-t-lg md:rounded-t-none md:rounded-ss-lg md:border-e dark:bg-gray-800 dark:border-gray-700">
+        <blockquote className="max-w-2xl mx-auto mb-4 text-gray-500 lg:mb-8 dark:text-gray-400">
+    
+        <div className="flex justify-center">
+            <Stars key="1" />
+        </div>  
+       <p className="my-4">PDFSnap is a game-changer for students. It swiftly extracts relevant details, making finding answers easier—a personal assistant for academics!</p>
+        </blockquote>
+        <figcaption className="flex items-center justify-center ">
+            <img className="rounded-full w-9 h-9" src="https://flowbite.s3.amazonaws.com/blocks/marketing-ui/avatars/karen-nelson.png" alt="profile picture" />
+            <div className="space-y-0.5 font-medium dark:text-white text-left rtl:text-right ms-3">
+                <div>Bonnie Green</div>
+                <div className="text-sm text-gray-500 dark:text-gray-400 ">IT Student</div>
+            </div>
+        </figcaption>    
+    </figure>
+    <figure className="flex flex-col items-center justify-center p-8 text-center bg-white border-b border-gray-200 md:rounded-se-lg dark:bg-gray-800 dark:border-gray-700">
+        <blockquote className="max-w-2xl mx-auto mb-4 text-gray-500 lg:mb-8 dark:text-gray-400 ">
+        <div className="flex justify-center">
+            <Stars key="1" />
+        </div>        
+            <p className="my-4">PDFSnap boosts our support efficiency. Instantly retrieving info from manuals helps provide precise and quick responses to customer queries—an invaluable tool for our team!</p>
+        </blockquote>
+        <figcaption className="flex items-center justify-center ">
+            <img className="rounded-full w-9 h-9" src="https://flowbite.s3.amazonaws.com/blocks/marketing-ui/avatars/roberta-casas.png" alt="profile picture" />
+            <div className="space-y-0.5 font-medium dark:text-white text-left rtl:text-right ms-3">
+                <div>Roberta Casas</div>
+                <div className="text-sm text-gray-500 dark:text-gray-400">Lead designer at Dropbox</div>
+            </div>
+        </figcaption>    
+    </figure>
+    <figure className="flex flex-col items-center justify-center p-8 text-center bg-white border-b border-gray-200 md:rounded-es-lg md:border-b-0 md:border-e dark:bg-gray-800 dark:border-gray-700">
+    <blockquote className="max-w-2xl mx-auto mb-4 text-gray-500 lg:mb-8 dark:text-gray-400">
+    <div className="flex justify-center">
+            <Stars key="1" />
+        </div>  
+        <p className="my-4">PDFSnap simplifies legal documents. It swiftly extracts crucial information, becoming indispensable in enhancing our ability to access case-relevant details.</p>
+      </blockquote>
+        <figcaption className="flex items-center justify-center ">
+            <img className="rounded-full w-9 h-9" src="https://flowbite.s3.amazonaws.com/blocks/marketing-ui/avatars/jese-leos.png" alt="profile picture" />
+            <div className="space-y-0.5 font-medium dark:text-white text-left rtl:text-right ms-3">
+                <div>Jese Leos</div>
+                <div className="text-sm text-gray-500 dark:text-gray-400">Software Engineer</div>
+            </div>
+        </figcaption>    
+    </figure>
+    <figure className="flex flex-col items-center justify-center p-8 text-center bg-white border-gray-200 rounded-b-lg md:rounded-se-lg dark:bg-gray-800 dark:border-gray-700">
+        <blockquote className="max-w-2xl mx-auto mb-4 text-gray-500 lg:mb-8 dark:text-gray-400">
+        <div className="flex justify-center">
+            <Stars key="1" />
+        </div>  
+            <p className="my-4">PDFSnap revolutionized my research! Extracting key info and answering questions is a breeze, saving me valuable time.</p>
+        </blockquote>
+        <figcaption className="flex items-center justify-center ">
+            <img className="rounded-full w-9 h-9" src="https://flowbite.s3.amazonaws.com/blocks/marketing-ui/avatars/joseph-mcfall.png" alt="profile picture" />
+            <div className="space-y-0.5 font-medium dark:text-white text-left rtl:text-right ms-3">
+                <div>Joseph McFall</div>
+                <div className="text-sm text-gray-500 dark:text-gray-400">Data Analyst</div>
+            </div>
+        </figcaption>    
+    </figure>
+</div>
+
       </div>
+      </div>
+      <Footer />
+
     </>
   )
 }

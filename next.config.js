@@ -23,6 +23,9 @@ const nextConfig = {
     config.resolve.alias.encoding = false
     return config
   },
+  images: {
+    domains: ['avatars.githubusercontent.com', 'lh3.googleusercontent.com'],
+  },
 }
 
 module.exports = nextConfig
