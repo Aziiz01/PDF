@@ -1,44 +1,67 @@
-# PDFSnap - A Modern Fullstack SaaS-Platform
+# 📄 PDF Snap
 
-Built with the Next.js 13.5 App Router, tRPC, TypeScript, Prisma & Tailwind
+> **Ask anything from any PDF.**  
+> Upload your PDF and chat with it — powered by **OpenAI**, **Pinecone**, and **Next.js 14**.
 
-![Project Image](https://github.com/joschan21/quill/blob/master/public/thumbnail.png)
+🌐 **Live App** → [pdf-69zi.vercel.app](https://pdf-69zi.vercel.app/)
 
-## Features
+---
 
-- 🛠️ Complete SaaS Built From Scratch
-- 💻 Beautiful Landing Page & Pricing Page Included
-- 💳 Free & Pro Plan Using Stripe
-- 📄 A Beautiful And Highly Functional PDF Viewer
-- 🔄 Streaming API Responses in Real-Time
-- 🔒 Authentication Using Kinde
-- 🎨 Clean, Modern UI Using 'shadcn-ui'
-- 🚀 Optimistic UI Updates for a Great UX
-- ⚡ Infinite Message Loading for Performance
-- 📤 Intuitive Drag n’ Drop Uploads
-- ✨ Instant Loading States
-- 🔧 Modern Data Fetching Using tRPC & Zod
-- 🧠 LangChain for Infinite AI Memory
-- 🌲 Pinecone as our Vector Storage
-- 📊 Prisma as our ORM
-- 🔤 100% written in TypeScript
-- 🎁 ...much more
+## ✅ Status
 
-## Getting started
+🟢 **Project Completed** and deployed. Production-ready and stable.
 
-To get started with this project, run
+---
+
+## 🧠 What is PDF Snap?
+
+**PDF Snap** is a smart document assistant that lets you interact with any PDF using natural language. Simply upload a file and ask questions — it instantly retrieves the most relevant answers using semantic search and GPT-based reasoning.
+
+Perfect for:
+- Students reading academic papers
+- Lawyers working through contracts
+- Researchers analyzing reports
+- Anyone who wants to save time reading PDFs
+
+---
+
+## 🛠️ Built With
+
+| Technology        | Purpose                                              |
+|-------------------|------------------------------------------------------|
+| **Next.js 14**    | App framework with App Router and Server Components |
+| **Firebase**      | User authentication and Firestore database          |
+| **Stripe**        | Subscription management and payments                |
+| **OpenAI API**    | ChatGPT-style language model responses              |
+| **Pinecone**      | Fast vector-based semantic search engine            |
+| **Tailwind CSS**  | Clean and modern UI styling                         |
+| **Vercel**        | Hosting and CI/CD                                    |
+
+---
+
+## ✨ Features
+
+- 🧠 **Chat with any PDF**
+- 🔍 Fast and accurate **semantic search** using Pinecone
+- 🔐 **Secure authentication** via Firebase
+- 💬 **Context-aware conversations** powered by OpenAI
+- 💳 **Stripe integration** for premium plans
+- 🗃️ Stores **chat and PDF history** per user
+- 📱 **Responsive design** (desktop/mobile)
+- ☁️ Hosted on **Vercel** with blazing-fast performance
+
+---
+
+## 🖼️ Demo Screenshots
+
+> _Coming soon: a full walkthrough or demo video_
+
+---
+
+## 🚀 Getting Started (for developers)
+
+### 1. Clone the Repo
 
 ```bash
-  git clone https://github.com/joschan21/quill.git
-```
-
-and copy the .env.example variables into a separate .env file, fill them out & and that's all you need to get started!
-
-
-## Acknowledgements
-
-- [Kinde Auth](https://link.joshtriedcoding.com/kinde) for making this project possible
-
-## License
-
-[MIT](https://choosealicense.com/licenses/mit/)
+git clone https://github.com/Aziiz01/PDF
+cd pdf-snap
