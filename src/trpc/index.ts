@@ -52,15 +52,15 @@ export const appRouter = router({
         ? await db.file.findMany({ where: { userId } })
         : []
 
-      // Always include the most recent file as a demo for everyone (works without auth)
-      const latestFile = await db.file.findFirst({
-        where: { uploadStatus: 'SUCCESS' },
-        orderBy: { createdAt: 'desc' },
+      // Always show this exact demo PDF (regardless of uploadStatus)
+      const DEMO_FILE_ID = '69be2e8b5e31919cd59fdcff'
+      const demoFile = await db.file.findFirst({
+        where: { id: DEMO_FILE_ID },
       })
-      if (latestFile && !userFiles.some((f) => f.id === latestFile.id)) {
+      if (demoFile && !userFiles.some((f) => f.id === demoFile.id)) {
         return [
           ...userFiles.map((f) => ({ ...f, isDemo: false })),
-          { ...latestFile, isDemo: true },
+          { ...demoFile, isDemo: true },
         ]
       }
       return userFiles.map((f) => ({ ...f, isDemo: false }))
