@@ -74,19 +74,15 @@ const ChatWrapper = ({
     return (
       <div className='relative min-h-full bg-zinc-50 flex divide-y divide-zinc-200 flex-col justify-between gap-2'>
         <div className='flex-1 flex justify-center items-center flex-col mb-28'>
-          <div className='flex flex-col items-center gap-2'>
-            <XCircle className='h-8 w-8 text-red-500' />
+          <div className='flex flex-col items-center gap-2 text-center max-w-sm'>
+            <XCircle className='h-8 w-8 text-amber-500' />
             <h3 className='font-semibold text-xl'>
-              Open Ai Api expired
+              AI chat unavailable
             </h3>
             <p className='text-zinc-500 text-sm'>
-             This is just a {' '}
-              <span className='font-medium'>
-                {isSubscribed ? 'Pro' : 'Showcase'}
-              </span>{' '}
-              of
-             
-              my website 
+              The OpenAI API key has expired, so PDF processing and chat
+              aren&apos;t working. This is a portfolio showcase—feel free to
+              explore the rest of the app.
             </p>
             <Link
               href='/dashboard'
@@ -95,7 +91,7 @@ const ChatWrapper = ({
                 className: 'mt-4',
               })}>
               <ChevronLeft className='h-3 w-3 mr-1.5' />
-              Back
+              Back to Dashboard
             </Link>
           </div>
         </div>

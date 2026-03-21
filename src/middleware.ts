@@ -1,9 +1,7 @@
 import { authMiddleware } from '@kinde-oss/kinde-auth-nextjs/server'
 
 export const config = {
- // matcher: ['/dashboard/:path*', '/auth-callback'],
-   matcher: [], // ← Runs nowhere
-
+  matcher: [], // Auth bypassed for now - dashboard accessible without login
 }
 
 export default authMiddleware

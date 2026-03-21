@@ -6,13 +6,12 @@ generator client {
 }
 
 datasource db {
-  provider     = "mysql"
-  url          = env("DATABASE_URL")
-  relationMode = "prisma"
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
 }
 
 model User {
-  id    String @id @unique //matches kinde user id
+  id    String @id @map("_id") // matches kinde user id
   email String @unique
 
   File    File[]
@@ -32,7 +31,7 @@ enum UploadStatus {
 }
 
 model File {
-  id   String @id @default(cuid())
+  id   String @id @default(auto()) @map("_id") @db.ObjectId
   name String
 
   uploadStatus UploadStatus @default(PENDING)
@@ -48,8 +47,8 @@ model File {
 }
 
 model Message {
-  id   String @id @default(cuid())
-  text String @db.Text()
+  id   String @id @default(auto()) @map("_id") @db.ObjectId
+  text String
 
   isUserMessage Boolean
 
@@ -58,5 +57,5 @@ model Message {
   User      User?    @relation(fields: [userId], references: [id])
   userId    String?
   File      File?    @relation(fields: [fileId], references: [id])
-  fileId    String?
+  fileId    String?  @db.ObjectId
 }

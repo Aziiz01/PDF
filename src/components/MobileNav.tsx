@@ -37,10 +37,10 @@ const MobileNav = ({ isAuth }: { isAuth: boolean }) => {
                 <li>
                   <Link
                     onClick={() =>
-                      closeOnCurrent('/sign-up')
+                      closeOnCurrent('/dashboard')
                     }
                     className='flex items-center w-full font-semibold text-green-600'
-                    href='/sign-up'>
+                    href='/dashboard'>
                     Get started
                     <ArrowRight className='ml-2 h-5 w-5' />
                   </Link>

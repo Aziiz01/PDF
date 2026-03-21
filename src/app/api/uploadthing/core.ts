@@ -1,5 +1,5 @@
 import { db } from '@/db'
-import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server'
+import { getUserId } from '@/lib/auth'
 import {
   createUploadthing,
   type FileRouter,
@@ -15,14 +15,12 @@ import { PLANS } from '@/config/stripe'
 const f = createUploadthing()
 
 const middleware = async () => {
-  const { getUser } = getKindeServerSession()
- // const user = getUser()
-
- // if (!user || !user.id) throw new Error('Unauthorized')
+  const userId = await getUserId()
+  if (!userId) throw new Error('Unauthorized')
 
   const subscriptionPlan = await getUserSubscriptionPlan()
 
-  return { subscriptionPlan, userId: 'user.id' }
+  return { subscriptionPlan, userId }
 }
 
 const onUploadComplete = async ({
@@ -48,7 +46,7 @@ const onUploadComplete = async ({
     data: {
       key: file.key,
       name: file.name,
-      userId: 'metadata.userId',
+      userId: metadata.userId,
       url: file.url,
       uploadStatus: 'PROCESSING',
     },

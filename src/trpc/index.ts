@@ -17,21 +17,10 @@ import { PLANS } from '@/config/stripe'
 
 export const appRouter = router({
   authCallback: publicProcedure.query(async () => {
-    // -----------------------------------------------------------------
-    // 🚨 DEVELOPMENT BYPASS LOGIC 🚨
-    // This block ensures the callback always succeeds in development, 
-    // allowing immediate access to the dashboard for testing.
-    // -----------------------------------------------------------------
-    if (process.env.NODE_ENV === 'development') {
-      console.log("[DEV BYPASS] AuthCallback bypassed. Returning success: true.")
-      return { success: true }
-    }
-    // -----------------------------------------------------------------
-    
     const { getUser } = getKindeServerSession()
     const user = getUser()
 
-    if (!user.id || !user.email)
+    if (!user || !user.id || !user.email)
       throw new TRPCError({ code: 'UNAUTHORIZED' })
 
     // check if the user is in the database
