@@ -13,14 +13,14 @@ type AuthUser = {
 
 /**
  * Gets the current user for server-side operations.
- * In development with no Kinde session, uses or creates a dev user.
+ * When no Kinde session exists, uses first DB user or creates a fallback user.
  */
 export async function getAuthUser(): Promise<AuthUser | null> {
   const { getUser } = getKindeServerSession()
   let user = getUser()
 
-  // Auth bypass: in development, use first DB user or create dev user when no Kinde session
-  if ((!user || !user.id) && process.env.NODE_ENV === 'development') {
+  // Fallback: when no Kinde session, use first DB user or create one (works in dev and production)
+  if (!user || !user.id) {
     let dbUser = await db.user.findFirst()
     if (!dbUser) {
       dbUser = await db.user.create({
