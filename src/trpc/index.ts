@@ -45,11 +45,21 @@ export const appRouter = router({
   getUserFiles: privateProcedure.query(async ({ ctx }) => {
     const { userId } = ctx
     try {
-      return await db.file.findMany({
-        where: {
-          userId,
-        },
+      const userFiles = await db.file.findMany({
+        where: { userId },
       })
+      // Always include the most recent file from the DB as a demo for everyone to test
+      const latestFile = await db.file.findFirst({
+        where: { uploadStatus: 'SUCCESS' },
+        orderBy: { createdAt: 'desc' },
+      })
+      if (latestFile && !userFiles.some((f) => f.id === latestFile.id)) {
+        return [
+          ...userFiles.map((f) => ({ ...f, isDemo: false })),
+          { ...latestFile, isDemo: true },
+        ]
+      }
+      return userFiles.map((f) => ({ ...f, isDemo: false }))
     } catch (err) {
       console.error('[getUserFiles]', err)
       return []
@@ -123,15 +133,11 @@ export const appRouter = router({
       })
     )
     .query(async ({ ctx, input }) => {
-      const { userId } = ctx
       const { fileId, cursor } = input
       const limit = input.limit ?? INFINITE_QUERY_LIMIT
 
       const file = await db.file.findFirst({
-        where: {
-          id: fileId,
-          userId,
-        },
+        where: { id: fileId },
       })
 
       if (!file) throw new TRPCError({ code: 'NOT_FOUND' })
@@ -167,12 +173,9 @@ export const appRouter = router({
 
   getFileUploadStatus: privateProcedure
     .input(z.object({ fileId: z.string() }))
-    .query(async ({ input, ctx }) => {
+    .query(async ({ input }) => {
       const file = await db.file.findFirst({
-        where: {
-          id: input.fileId,
-          userId: ctx.userId,
-        },
+        where: { id: input.fileId },
       })
 
       if (!file) return { status: 'PENDING' as const }

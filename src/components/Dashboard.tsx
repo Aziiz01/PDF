@@ -75,6 +75,11 @@ const Dashboard = ({subscriptionPlan}: PageProps) => {
                         <h3 className='truncate text-lg font-medium text-zinc-900'>
                           {file.name}
                         </h3>
+                        {'isDemo' in file && file.isDemo && (
+                          <span className='rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700'>
+                            Try it
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -94,19 +99,26 @@ const Dashboard = ({subscriptionPlan}: PageProps) => {
                     mocked
                   </div>
 
-                  <Button
-                    onClick={() =>
-                      deleteFile({ id: file.id })
-                    }
-                    size='sm'
-                    className='w-full'
-                    variant='destructive'>
-                    {currentlyDeletingFile === file.id ? (
-                      <Loader2 className='h-4 w-4 animate-spin' />
-                    ) : (
-                      <Trash className='h-4 w-4' />
-                    )}
-                  </Button>
+                  {'isDemo' in file && file.isDemo ? (
+                    <div className='w-full text-center text-xs text-zinc-400'>
+                      Shared demo
+                    </div>
+                  ) : (
+                    <Button
+                      onClick={(e) => {
+                        e.preventDefault()
+                        deleteFile({ id: file.id })
+                      }}
+                      size='sm'
+                      className='w-full'
+                      variant='destructive'>
+                      {currentlyDeletingFile === file.id ? (
+                        <Loader2 className='h-4 w-4 animate-spin' />
+                      ) : (
+                        <Trash className='h-4 w-4' />
+                      )}
+                    </Button>
+                  )}
                 </div>
               </li>
             ))}
