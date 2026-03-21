@@ -6,6 +6,7 @@ import {
 } from './trpc'
 import { TRPCError } from '@trpc/server'
 import { db } from '@/db'
+import { getAuthUser } from '@/lib/auth'
 import { z } from 'zod'
 import { INFINITE_QUERY_LIMIT } from '@/config/infinite-query'
 import { absoluteUrl } from '@/lib/utils'
@@ -42,13 +43,16 @@ export const appRouter = router({
 
     return { success: true }
   }),
-  getUserFiles: privateProcedure.query(async ({ ctx }) => {
-    const { userId } = ctx
+  getUserFiles: publicProcedure.query(async () => {
     try {
-      const userFiles = await db.file.findMany({
-        where: { userId },
-      })
-      // Always include the most recent file from the DB as a demo for everyone to test
+      const user = await getAuthUser()
+      const userId = user?.id
+
+      const userFiles = userId
+        ? await db.file.findMany({ where: { userId } })
+        : []
+
+      // Always include the most recent file as a demo for everyone (works without auth)
       const latestFile = await db.file.findFirst({
         where: { uploadStatus: 'SUCCESS' },
         orderBy: { createdAt: 'desc' },
