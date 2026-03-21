@@ -42,14 +42,17 @@ export async function getAuthUser(): Promise<AuthUser | null> {
   }
 
   if (!user?.id) return null
+  const given = user.given_name ?? null
+  const family = user.family_name ?? null
+  const name = given && family ? `${given} ${family}` : given ?? family ?? null
   return {
     id: user.id,
     email: user.email ?? '',
-    given_name: user.given_name ?? null,
-    family_name: user.family_name ?? null,
-    name: user.name ?? null,
+    given_name: given,
+    family_name: family,
+    name,
     picture: user.picture ?? null,
-    updated_at: user.updated_at ?? null,
+    updated_at: null,
   }
 }
 
