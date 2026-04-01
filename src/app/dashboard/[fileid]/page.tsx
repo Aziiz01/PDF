@@ -1,6 +1,7 @@
 import ChatWrapper from '@/components/chat/ChatWrapper'
 import PdfRenderer from '@/components/PdfRenderer'
 import { db } from '@/db'
+import { getAuthUser } from '@/lib/auth'
 import { getUserSubscriptionPlan } from '@/lib/stripe'
 import { notFound } from 'next/navigation'
 
@@ -13,9 +14,11 @@ interface PageProps {
 const Page = async ({ params }: PageProps) => {
   const { fileid } = params
 
-  // Auth bypassed - fetch file without user filter (first matching file by id)
+  const user = await getAuthUser()
+  if (!user) notFound()
+
   const file = await db.file.findFirst({
-    where: { id: fileid },
+    where: { id: fileid, userId: user.id },
   })
 
   if (!file) notFound()

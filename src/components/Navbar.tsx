@@ -1,14 +1,20 @@
 import Link from 'next/link'
 import MaxWidthWrapper from './MaxWidthWrapper'
 import { buttonVariants } from './ui/button'
-import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server'
 import { ArrowRight } from 'lucide-react'
 import UserAccountNav from './UserAccountNav'
 import MobileNav from './MobileNav'
 import Image from 'next/image'
-const Navbar = () => {
-  const { getUser } = getKindeServerSession()
-  const user = getUser()
+import { getAuthUser } from '@/lib/auth'
+import { getUserSubscriptionPlan } from '@/lib/stripe'
+
+const Navbar = async () => {
+  const user = await getAuthUser()
+  const subscriptionPlan = user
+    ? await getUserSubscriptionPlan()
+    : { isSubscribed: false }
+
+  const displayName = user?.name ?? user?.email ?? 'Your Account'
 
   return (
     <nav className='sticky h-14 inset-x-0 top-0 z-30 w-full border-b border-gray-200 bg-white/75 backdrop-blur-lg transition-all'>
@@ -17,10 +23,15 @@ const Navbar = () => {
           <Link
             href='/'
             className='flex z-40 font-semibold items-center'>
-              <Image height={20} width={20} alt="Logo" src="/favicon.ico" />
-                  <span className='ml-1'>PDFSnap</span>
+            <Image
+              height={20}
+              width={20}
+              alt='Logo'
+              src='/favicon.ico'
+            />
+            <span className='ml-1'>PDFSnap</span>
           </Link>
-        
+
           <MobileNav isAuth={!!user} />
 
           <div className='hidden items-center space-x-4 sm:flex'>
@@ -43,7 +54,7 @@ const Navbar = () => {
                   Sign in
                 </Link>
                 <Link
-                  href='/dashboard'
+                  href='/register'
                   className={buttonVariants({
                     size: 'sm',
                   })}>
@@ -63,13 +74,9 @@ const Navbar = () => {
                 </Link>
 
                 <UserAccountNav
-                  name={
-                    !user.given_name || !user.family_name
-                      ? 'Your Account'
-                      : `${user.given_name} ${user.family_name}`
-                  }
-                  email={user.email ?? ''}
-                  imageUrl={user.picture ?? ''}
+                  name={displayName}
+                  email={user.email}
+                  subscriptionPlan={subscriptionPlan}
                 />
               </>
             )}

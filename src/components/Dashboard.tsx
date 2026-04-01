@@ -2,25 +2,21 @@
 
 import { trpc } from '@/app/_trpc/client'
 import UploadButton from './UploadButton'
-import {
-  Ghost,
-  Loader2,
-  MessageSquare,
-  Plus,
-  Trash,
-} from 'lucide-react'
+import { Loader2, MessageSquare, Plus, Trash } from 'lucide-react'
 import Skeleton from 'react-loading-skeleton'
 import Link from 'next/link'
 import { format } from 'date-fns'
 import { Button } from './ui/button'
 import { useState } from 'react'
-import { getUserSubscriptionPlan } from '@/lib/stripe'
+import EmptyPdfState from './EmptyPdfState'
 
 interface PageProps {
-  subscriptionPlan: Awaited<ReturnType<typeof getUserSubscriptionPlan>>
+  subscriptionPlan: {
+    isSubscribed: boolean
+  }
 }
 
-const Dashboard = ({subscriptionPlan}: PageProps) => {
+const Dashboard = ({ subscriptionPlan }: PageProps) => {
   const [currentlyDeletingFile, setCurrentlyDeletingFile] =
     useState<string | null>(null)
 
@@ -29,8 +25,8 @@ const Dashboard = ({subscriptionPlan}: PageProps) => {
   const { data: files, isLoading } =
     trpc.getUserFiles.useQuery()
 
-  const { mutate: deleteFile } =
-    trpc.deleteFile.useMutation({
+  const { mutate: deleteFile } = trpc.deleteFile.useMutation(
+    {
       onSuccess: () => {
         utils.getUserFiles.invalidate()
       },
@@ -40,7 +36,8 @@ const Dashboard = ({subscriptionPlan}: PageProps) => {
       onSettled() {
         setCurrentlyDeletingFile(null)
       },
-    })
+    }
+  )
 
   return (
     <main className='mx-auto max-w-7xl md:p-10'>
@@ -49,11 +46,12 @@ const Dashboard = ({subscriptionPlan}: PageProps) => {
           My Files
         </h1>
 
-        <UploadButton isSubscribed={subscriptionPlan.isSubscribed} />
+        <UploadButton
+          isSubscribed={subscriptionPlan.isSubscribed}
+        />
       </div>
 
-      {/* display all user files */}
-      {files && files?.length !== 0 ? (
+      {files && files.length !== 0 ? (
         <ul className='mt-8 grid grid-cols-1 gap-6 divide-y divide-zinc-200 md:grid-cols-2 lg:grid-cols-3'>
           {files
             .sort(
@@ -75,11 +73,6 @@ const Dashboard = ({subscriptionPlan}: PageProps) => {
                         <h3 className='truncate text-lg font-medium text-zinc-900'>
                           {file.name}
                         </h3>
-                        {'isDemo' in file && file.isDemo && (
-                          <span className='rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700'>
-                            Try it
-                          </span>
-                        )}
                       </div>
                     </div>
                   </div>
@@ -99,26 +92,20 @@ const Dashboard = ({subscriptionPlan}: PageProps) => {
                     mocked
                   </div>
 
-                  {'isDemo' in file && file.isDemo ? (
-                    <div className='w-full text-center text-xs text-zinc-400'>
-                      Shared demo
-                    </div>
-                  ) : (
-                    <Button
-                      onClick={(e) => {
-                        e.preventDefault()
-                        deleteFile({ id: file.id })
-                      }}
-                      size='sm'
-                      className='w-full'
-                      variant='destructive'>
-                      {currentlyDeletingFile === file.id ? (
-                        <Loader2 className='h-4 w-4 animate-spin' />
-                      ) : (
-                        <Trash className='h-4 w-4' />
-                      )}
-                    </Button>
-                  )}
+                  <Button
+                    onClick={(e) => {
+                      e.preventDefault()
+                      deleteFile({ id: file.id })
+                    }}
+                    size='sm'
+                    className='w-full'
+                    variant='destructive'>
+                    {currentlyDeletingFile === file.id ? (
+                      <Loader2 className='h-4 w-4 animate-spin' />
+                    ) : (
+                      <Trash className='h-4 w-4' />
+                    )}
+                  </Button>
                 </div>
               </li>
             ))}
@@ -126,13 +113,7 @@ const Dashboard = ({subscriptionPlan}: PageProps) => {
       ) : isLoading ? (
         <Skeleton height={100} className='my-2' count={3} />
       ) : (
-        <div className='mt-16 flex flex-col items-center gap-2'>
-          <Ghost className='h-8 w-8 text-zinc-800' />
-          <h3 className='font-semibold text-xl'>
-            Pretty empty around here
-          </h3>
-          <p>Let&apos;s upload your first PDF.</p>
-        </div>
+        <EmptyPdfState />
       )}
     </main>
   )

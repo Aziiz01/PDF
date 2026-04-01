@@ -51,6 +51,8 @@ export const ChatContextProvider = ({
     }) => {
       const response = await fetch('/api/message', {
         method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           fileId,
           message,

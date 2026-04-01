@@ -11,8 +11,9 @@ datasource db {
 }
 
 model User {
-  id    String @id @map("_id") // matches kinde user id
-  email String @unique
+  id           String  @id @map("_id")
+  email        String  @unique
+  passwordHash String? @map("password_hash")
 
   File    File[]
   Message Message[]
@@ -35,6 +36,8 @@ model File {
   name String
 
   uploadStatus UploadStatus @default(PENDING)
+  // Shown when uploadStatus is FAILED
+  processingError String? @map("processing_error")
 
   url      String
   key      String

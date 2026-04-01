@@ -45,7 +45,7 @@ const PrivacyPolicy = () => {
             <ul className='mb-5'>
                 <li>Directly: You provide personal information when registering, using the Feedback and Support form, or requesting assistance.</li>
                 <li>Indirectly: Personal information may be collected during interactions on our website, via email, telephone, or other forums.</li>
-                <li>From third parties: We collect information from authentication providers (Clerk : <a href="https://clerk.com/privacy" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'underline', color: '#001F3F' }}>View Clerk privacy policy here</a>), analytics, cookie providers, and marketing providers.</li>
+                <li>From third parties: We collect information from analytics, cookie providers, and marketing providers where applicable.</li>
             </ul>
 
       </section>

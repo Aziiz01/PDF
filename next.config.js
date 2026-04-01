@@ -10,8 +10,8 @@ const nextConfig = {
     return [
       {
         source: '/sign-up',
-        destination: '/api/auth/register',
-        permanent: true,
+        destination: '/register',
+        permanent: false,
       },
       {
         source: '/sign-out',

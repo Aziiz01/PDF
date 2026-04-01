@@ -15,6 +15,20 @@ export function absoluteUrl(path: string) {
   }${path}`
 }
 
+/**
+ * Post-login redirect: only same-origin relative paths.
+ * Rejects `//evil.com` (starts with `/` but is a protocol-relative URL).
+ */
+export function getSafeRedirectPath(
+  from: string | null | undefined
+): string {
+  if (!from || typeof from !== 'string') return '/dashboard'
+  const t = from.trim()
+  if (!t.startsWith('/') || t.startsWith('//'))
+    return '/dashboard'
+  return t
+}
+
 export function constructMetadata({
   title = "PDFSnap - the SaaS for students",
   description = "PDFSnap is an open-source software to make chatting to your PDF files easy.",

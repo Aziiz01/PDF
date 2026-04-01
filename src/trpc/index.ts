@@ -1,4 +1,3 @@
-import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server'
 import {
   privateProcedure,
   publicProcedure,
@@ -18,52 +17,20 @@ import { PLANS } from '@/config/stripe'
 
 export const appRouter = router({
   authCallback: publicProcedure.query(async () => {
-    const { getUser } = getKindeServerSession()
-    const user = getUser()
-
-    if (!user || !user.id || !user.email)
+    const user = await getAuthUser()
+    if (!user) {
       throw new TRPCError({ code: 'UNAUTHORIZED' })
-
-    // check if the user is in the database
-    const dbUser = await db.user.findFirst({
-      where: {
-        id: user.id,
-      },
-    })
-
-    if (!dbUser) {
-      // create user in db
-      await db.user.create({
-        data: {
-          id: user.id,
-          email: user.email,
-        },
-      })
     }
-
     return { success: true }
   }),
-  getUserFiles: publicProcedure.query(async () => {
+
+  getUserFiles: privateProcedure.query(async ({ ctx }) => {
     try {
-      const user = await getAuthUser()
-      const userId = user?.id
-
-      const userFiles = userId
-        ? await db.file.findMany({ where: { userId } })
-        : []
-
-      // Always show this exact demo PDF (regardless of uploadStatus)
-      const DEMO_FILE_ID = '69be2e8b5e31919cd59fdcff'
-      const demoFile = await db.file.findFirst({
-        where: { id: DEMO_FILE_ID },
+      const userFiles = await db.file.findMany({
+        where: { userId: ctx.userId },
+        orderBy: { createdAt: 'desc' },
       })
-      if (demoFile && !userFiles.some((f) => f.id === demoFile.id)) {
-        return [
-          ...userFiles.map((f) => ({ ...f, isDemo: false })),
-          { ...demoFile, isDemo: true },
-        ]
-      }
-      return userFiles.map((f) => ({ ...f, isDemo: false }))
+      return userFiles
     } catch (err) {
       console.error('[getUserFiles]', err)
       return []
@@ -141,7 +108,7 @@ export const appRouter = router({
       const limit = input.limit ?? INFINITE_QUERY_LIMIT
 
       const file = await db.file.findFirst({
-        where: { id: fileId },
+        where: { id: fileId, userId: ctx.userId },
       })
 
       if (!file) throw new TRPCError({ code: 'NOT_FOUND' })
@@ -177,14 +144,26 @@ export const appRouter = router({
 
   getFileUploadStatus: privateProcedure
     .input(z.object({ fileId: z.string() }))
-    .query(async ({ input }) => {
+    .query(async ({ ctx, input }) => {
       const file = await db.file.findFirst({
-        where: { id: input.fileId },
+        where: { id: input.fileId, userId: ctx.userId },
       })
 
-      if (!file) return { status: 'PENDING' as const }
+      if (!file) {
+        return {
+          status: 'PENDING' as const,
+          processingError: null as string | null,
+        }
+      }
 
-      return { status: file.uploadStatus }
+      const row = file as typeof file & {
+        processingError?: string | null
+      }
+
+      return {
+        status: file.uploadStatus,
+        processingError: row.processingError ?? null,
+      }
     }),
 
   getFile: privateProcedure

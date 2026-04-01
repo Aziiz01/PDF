@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/tooltip'
 import { PLANS } from '@/config/stripe'
 import { cn } from '@/lib/utils'
-import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server'
+import { getAuthUser } from '@/lib/auth'
 import {
   ArrowRight,
   Check,
@@ -18,9 +18,8 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 
-const Page = () => {
-  const { getUser } = getKindeServerSession()
-  const user = getUser()
+const Page = async () => {
+  const user = await getAuthUser()
 
   const pricingItems = [
     {
@@ -213,7 +212,7 @@ const Page = () => {
                       {plan === 'Free' ? (
                         <Link
                           href={
-                            user ? '/dashboard' : '/sign-in'
+                            user ? '/dashboard' : '/register'
                           }
                           className={buttonVariants({
                             className: 'w-full',

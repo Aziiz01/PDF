@@ -7,17 +7,22 @@ import { ChevronLeft, Loader2, XCircle } from 'lucide-react'
 import Link from 'next/link'
 import { buttonVariants } from '../ui/button'
 import { ChatContextProvider } from './ChatContext'
-import { PLANS } from '@/config/stripe'
+import { useEffect, useState } from 'react'
 
 interface ChatWrapperProps {
   fileId: string
   isSubscribed: boolean
 }
 
+const SLOW_PROCESSING_MS = 30_000
+
 const ChatWrapper = ({
   fileId,
   isSubscribed,
 }: ChatWrapperProps) => {
+  const [processingSlow, setProcessingSlow] =
+    useState(false)
+
   const { data, isLoading } =
     trpc.getFileUploadStatus.useQuery(
       {
@@ -31,6 +36,18 @@ const ChatWrapper = ({
             : 500,
       }
     )
+
+  useEffect(() => {
+    if (data?.status !== 'PROCESSING') {
+      setProcessingSlow(false)
+      return
+    }
+    const t = setTimeout(
+      () => setProcessingSlow(true),
+      SLOW_PROCESSING_MS
+    )
+    return () => clearTimeout(t)
+  }, [data?.status, fileId])
 
   if (isLoading)
     return (
@@ -63,6 +80,13 @@ const ChatWrapper = ({
             <p className='text-zinc-500 text-sm'>
               This won&apos;t take long.
             </p>
+            {processingSlow ? (
+              <p className='text-zinc-600 text-xs mt-3 max-w-xs'>
+                Still working — embedding many pages can take a few minutes on
+                the free Hugging Face API. If this never finishes, check the
+                server terminal for errors or try a smaller PDF.
+              </p>
+            ) : null}
           </div>
         </div>
 
@@ -74,15 +98,15 @@ const ChatWrapper = ({
     return (
       <div className='relative min-h-full bg-zinc-50 flex divide-y divide-zinc-200 flex-col justify-between gap-2'>
         <div className='flex-1 flex justify-center items-center flex-col mb-28'>
-          <div className='flex flex-col items-center gap-2 text-center max-w-sm'>
+          <div className='flex flex-col items-center gap-2 text-center max-w-md px-3'>
             <XCircle className='h-8 w-8 text-amber-500' />
             <h3 className='font-semibold text-xl'>
               AI chat unavailable
             </h3>
-            <p className='text-zinc-500 text-sm'>
-              The OpenAI API key has expired, so PDF processing and chat
-              aren&apos;t working. This is a portfolio showcase—feel free to
-              explore the rest of the app.
+            <p className='text-zinc-500 text-sm whitespace-pre-wrap'>
+              {(data as { processingError?: string | null })
+                .processingError ??
+                'PDF processing did not finish. Check the server log, Hugging Face, and Pinecone (index dimension must match embeddings, e.g. 384 for the default HF model).'}
             </p>
             <Link
               href='/dashboard'
