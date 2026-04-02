@@ -3,6 +3,7 @@
 import { getUserSubscriptionPlan } from '@/lib/stripe'
 import { useToast } from './ui/use-toast'
 import { trpc } from '@/app/_trpc/client'
+import AiProviderSettings from './AiProviderSettings'
 import MaxWidthWrapper from './MaxWidthWrapper'
 import {
   Card,
@@ -82,6 +83,8 @@ const BillingForm = ({
           </CardFooter>
         </Card>
       </form>
+
+      <AiProviderSettings />
     </MaxWidthWrapper>
   )
 }

@@ -1,16 +1,17 @@
 import { PineconeClient } from '@pinecone-database/pinecone'
 import {
   getExpectedEmbeddingDimensions,
+  getPineconeEnvironment,
   getPineconeIndexName,
   pineconeDimensionSetupHint,
-} from '@/lib/hf-config'
+} from '@/lib/openai-config'
 
 export const getPineconeClient = async () => {
   const client = new PineconeClient()
 
   await client.init({
     apiKey: process.env.PINECONE_API_KEY!,
-    environment: 'gcp-starter',
+    environment: getPineconeEnvironment(),
   })
 
   return client

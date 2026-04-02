@@ -2,14 +2,14 @@ import { db } from '@/db'
 import { getPineconeIndex } from '@/lib/pinecone'
 import { SendMessageValidator } from '@/lib/validators/SendMessageValidator'
 import { getAuthUser } from '@/lib/auth'
-import { createHuggingFaceEmbeddings } from '@/lib/hf-embeddings'
-import { buildChatPrompt } from '@/lib/hf-chat'
-import { HfInference } from '@huggingface/inference'
-import { getHfApiKey, HF_CHAT_MODEL } from '@/lib/hf-config'
+import { createOpenAiEmbeddings } from '@/lib/openai-embeddings'
 import { PineconeStore } from 'langchain/vectorstores/pinecone'
 import { NextRequest } from 'next/server'
+import OpenAI from 'openai'
 
-import { HuggingFaceStream, StreamingTextResponse } from 'ai'
+import { OpenAIStream, StreamingTextResponse } from 'ai'
+import { buildOpenAiMessages, OPENAI_CHAT_MODEL } from '@/lib/openai-chat'
+import { getUserOpenAiApiKey } from '@/lib/openai-user'
 
 export const POST = async (req: NextRequest) => {
   const body = await req.json()
@@ -33,6 +33,14 @@ export const POST = async (req: NextRequest) => {
   if (!file)
     return new Response('Not found', { status: 404 })
 
+  const openAiKey = await getUserOpenAiApiKey(userId)
+  if (!openAiKey) {
+    return new Response(
+      'Add your OpenAI API key on the Billing page to chat with your PDFs.',
+      { status: 400 }
+    )
+  }
+
   await db.message.create({
     data: {
       text: message,
@@ -43,7 +51,7 @@ export const POST = async (req: NextRequest) => {
   })
 
   try {
-    const embeddings = createHuggingFaceEmbeddings()
+    const embeddings = createOpenAiEmbeddings(openAiKey)
 
     const pineconeIndex = await getPineconeIndex()
 
@@ -70,57 +78,42 @@ export const POST = async (req: NextRequest) => {
       take: 6,
     })
 
-    const formattedPrevMessages = prevMessages.map(
-      (msg) => ({
-        role: msg.isUserMessage
-          ? ('user' as const)
-          : ('assistant' as const),
-        content: msg.text,
-      })
-    )
-
-    const conversationBlock = formattedPrevMessages
-      .map((m) => {
-        if (m.role === 'user')
-          return `User: ${m.content}\n`
-        return `Assistant: ${m.content}\n`
-      })
-      .join('')
-
     const contextBlock = results
       .map((r) => r.pageContent)
       .join('\n\n')
 
-    const prompt = buildChatPrompt(
+    const openai = new OpenAI({ apiKey: openAiKey })
+    const oaMessages = buildOpenAiMessages(
       contextBlock,
-      conversationBlock,
-      message
+      prevMessages.map((m) => ({
+        isUserMessage: m.isUserMessage,
+        text: m.text,
+      }))
     )
 
-    const hf = new HfInference(getHfApiKey())
-    const hfStream = hf.textGenerationStream({
-      model: HF_CHAT_MODEL,
-      inputs: prompt,
-      parameters: {
-        max_new_tokens: 1024,
-        temperature: 0.2,
-        return_full_text: false,
-        top_p: 0.9,
-      },
+    const oaStream = await openai.chat.completions.create({
+      model: OPENAI_CHAT_MODEL,
+      messages: oaMessages,
+      stream: true,
+      temperature: 0.2,
+      max_tokens: 1024,
     })
 
-    const stream = HuggingFaceStream(hfStream, {
-      async onCompletion(completion) {
-        await db.message.create({
-          data: {
-            text: completion,
-            isUserMessage: false,
-            fileId,
-            userId,
-          },
-        })
-      },
-    })
+    const stream = OpenAIStream(
+      oaStream as Parameters<typeof OpenAIStream>[0],
+      {
+        async onCompletion(completion) {
+          await db.message.create({
+            data: {
+              text: completion,
+              isUserMessage: false,
+              fileId,
+              userId,
+            },
+          })
+        },
+      }
+    )
 
     return new StreamingTextResponse(stream)
   } catch (err) {

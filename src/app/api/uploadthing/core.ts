@@ -7,12 +7,13 @@ import {
 
 import { PDFLoader } from 'langchain/document_loaders/fs/pdf'
 import { PineconeStore } from 'langchain/vectorstores/pinecone'
-import { createHuggingFaceEmbeddings } from '@/lib/hf-embeddings'
+import { createOpenAiEmbeddings } from '@/lib/openai-embeddings'
+import { getUserOpenAiApiKey } from '@/lib/openai-user'
 import { getPineconeIndex } from '@/lib/pinecone'
 import { getUserSubscriptionPlan } from '@/lib/stripe'
 import { PLANS } from '@/config/stripe'
 import { withTimeout } from '@/lib/with-timeout'
-import { pineconeDimensionSetupHint } from '@/lib/hf-config'
+import { formatUploadProcessingError } from '@/lib/upload-processing-error'
 import type { Document } from 'langchain/document'
 
 const f = createUploadthing()
@@ -32,10 +33,11 @@ const middleware = async () => {
 
 async function processUploadedPdf(
   createdFileId: string,
-  pageLevelDocs: Document[]
+  pageLevelDocs: Document[],
+  openaiApiKey: string
 ) {
   const pineconeIndex = await getPineconeIndex()
-  const embeddings = createHuggingFaceEmbeddings()
+  const embeddings = createOpenAiEmbeddings(openaiApiKey)
 
   await PineconeStore.fromDocuments(pageLevelDocs, embeddings, {
     pineconeIndex,
@@ -135,8 +137,23 @@ const onUploadComplete = async ({
       return
     }
 
+    const openaiKey = await getUserOpenAiApiKey(metadata.userId)
+    if (!openaiKey) {
+      await db.file.update({
+        data: {
+          uploadStatus: 'FAILED',
+          processingError:
+            'This showcase uses OpenAI for your PDFs. Add your API key, then try uploading again.',
+        },
+        where: {
+          id: createdFile.id,
+        },
+      })
+      return
+    }
+
     await withTimeout(
-      processUploadedPdf(createdFile.id, pageLevelDocs),
+      processUploadedPdf(createdFile.id, pageLevelDocs, openaiKey),
       PROCESSING_BUDGET_MS,
       'PDF embedding and indexing'
     )
@@ -145,19 +162,10 @@ const onUploadComplete = async ({
       err instanceof Error ? err.message : String(err)
     console.error('[uploadthing onUploadComplete]', err)
 
-    const hint =
-      /dimension|vector|pinecone/i.test(message)
-        ? pineconeDimensionSetupHint()
-        : /rate|503|loading|model/i.test(message)
-          ? 'Hugging Face model may be cold-starting; wait and re-upload, or try a smaller HF_EMBEDDING_MODEL.'
-          : /timed out/i.test(message)
-            ? message
-            : message.slice(0, 400)
-
     await db.file.update({
       data: {
         uploadStatus: 'FAILED',
-        processingError: hint,
+        processingError: formatUploadProcessingError(message),
       },
       where: {
         id: createdFile.id,

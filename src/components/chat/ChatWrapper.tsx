@@ -7,6 +7,7 @@ import { ChevronLeft, Loader2, XCircle } from 'lucide-react'
 import Link from 'next/link'
 import { buttonVariants } from '../ui/button'
 import { ChatContextProvider } from './ChatContext'
+import { ChatDock } from './ChatDock'
 import { useEffect, useState } from 'react'
 
 interface ChatWrapperProps {
@@ -58,9 +59,6 @@ const ChatWrapper = ({
             <h3 className='font-semibold text-xl'>
               Loading...
             </h3>
-            <p className='text-zinc-500 text-sm'>
-              We&apos;re preparing your PDF.
-            </p>
           </div>
         </div>
 
@@ -77,14 +75,9 @@ const ChatWrapper = ({
             <h3 className='font-semibold text-xl'>
               Processing PDF...
             </h3>
-            <p className='text-zinc-500 text-sm'>
-              This won&apos;t take long.
-            </p>
             {processingSlow ? (
-              <p className='text-zinc-600 text-xs mt-3 max-w-xs'>
-                Still working — embedding many pages can take a few minutes on
-                the free Hugging Face API. If this never finishes, check the
-                server terminal for errors or try a smaller PDF.
+              <p className='text-zinc-500 text-xs mt-2 max-w-xs text-center'>
+                Large files can take a few minutes.
               </p>
             ) : null}
           </div>
@@ -96,42 +89,47 @@ const ChatWrapper = ({
 
   if (data?.status === 'FAILED')
     return (
-      <div className='relative min-h-full bg-zinc-50 flex divide-y divide-zinc-200 flex-col justify-between gap-2'>
-        <div className='flex-1 flex justify-center items-center flex-col mb-28'>
-          <div className='flex flex-col items-center gap-2 text-center max-w-md px-3'>
-            <XCircle className='h-8 w-8 text-amber-500' />
-            <h3 className='font-semibold text-xl'>
-              AI chat unavailable
-            </h3>
-            <p className='text-zinc-500 text-sm whitespace-pre-wrap'>
-              {(data as { processingError?: string | null })
-                .processingError ??
-                'PDF processing did not finish. Check the server log, Hugging Face, and Pinecone (index dimension must match embeddings, e.g. 384 for the default HF model).'}
-            </p>
-            <Link
-              href='/dashboard'
-              className={buttonVariants({
-                variant: 'secondary',
-                className: 'mt-4',
-              })}>
-              <ChevronLeft className='h-3 w-3 mr-1.5' />
-              Back to Dashboard
-            </Link>
+      <ChatContextProvider fileId={fileId}>
+        <div className='relative min-h-full bg-zinc-50 flex flex-col'>
+          <div className='flex-1 flex justify-center items-center flex-col px-3 pb-52 pt-8'>
+            <div className='flex flex-col items-center gap-3 text-center max-w-sm'>
+              <XCircle className='h-8 w-8 text-amber-500' />
+              <h3 className='font-semibold text-lg'>
+                Something went wrong
+              </h3>
+              <p className='text-zinc-600 text-sm line-clamp-6 whitespace-pre-wrap'>
+                {(data as { processingError?: string | null })
+                  .processingError ??
+                  'Processing failed. Add your OpenAI key and check Pinecone, then upload again.'}
+              </p>
+              <p className='text-zinc-400 text-xs'>
+                Re-upload from the dashboard after fixing setup.
+              </p>
+              <Link
+                href='/dashboard'
+                className={buttonVariants({
+                  variant: 'secondary',
+                  className: 'mt-1',
+                })}>
+                <ChevronLeft className='h-3 w-3 mr-1.5' />
+                Dashboard
+              </Link>
+            </div>
           </div>
-        </div>
 
-        <ChatInput isDisabled />
-      </div>
+          <ChatDock />
+        </div>
+      </ChatContextProvider>
     )
 
   return (
     <ChatContextProvider fileId={fileId}>
-      <div className='relative min-h-full bg-zinc-50 flex divide-y divide-zinc-200 flex-col justify-between gap-2'>
-        <div className='flex-1 justify-between flex flex-col mb-28'>
+      <div className='relative min-h-full bg-zinc-50 flex flex-col'>
+        <div className='flex-1 flex flex-col mb-44 min-h-0'>
           <Messages fileId={fileId} />
         </div>
 
-        <ChatInput />
+        <ChatDock />
       </div>
     </ChatContextProvider>
   )

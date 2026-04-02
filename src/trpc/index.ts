@@ -14,8 +14,49 @@ import {
   stripe,
 } from '@/lib/stripe'
 import { PLANS } from '@/config/stripe'
+import { encryptUserSecret } from '@/lib/encrypt-secret'
 
 export const appRouter = router({
+  getAiProviderSettings: privateProcedure.query(
+    async ({ ctx }) => {
+      const user = await db.user.findFirst({
+        where: { id: ctx.userId },
+        select: { openaiApiKeyEnc: true },
+      })
+      return {
+        hasOpenAiKey: Boolean(user?.openaiApiKeyEnc),
+      }
+    }
+  ),
+
+  setOpenAiApiKey: privateProcedure
+    .input(
+      z.object({
+        apiKey: z
+          .string()
+          .min(20, 'Key looks too short')
+          .regex(/^sk-/, 'OpenAI keys usually start with sk-'),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const enc = encryptUserSecret(input.apiKey.trim())
+      await db.user.update({
+        where: { id: ctx.userId },
+        data: { openaiApiKeyEnc: enc },
+      })
+      return { ok: true as const }
+    }),
+
+  clearOpenAiApiKey: privateProcedure.mutation(
+    async ({ ctx }) => {
+      await db.user.update({
+        where: { id: ctx.userId },
+        data: { openaiApiKeyEnc: null },
+      })
+      return { ok: true as const }
+    }
+  ),
+
   authCallback: publicProcedure.query(async () => {
     const user = await getAuthUser()
     if (!user) {
