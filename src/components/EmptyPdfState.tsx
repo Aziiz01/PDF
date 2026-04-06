@@ -20,12 +20,7 @@ const EmptyPdfState = () => {
         </h3>
         <p className='mt-2 text-sm text-zinc-600'>
           Upload a document to start chatting with it. This
-          showcase uses OpenAI — add your API key on{' '}
-          <Link
-            href='/dashboard/billing'
-            className='font-medium text-violet-700 underline decoration-violet-300 underline-offset-2 hover:text-violet-900'>
-            Billing
-          </Link>{' '}
+          showcase uses OpenAI — add your API key 
           first so we can index and answer questions about your PDFs.
         </p>
       </div>

@@ -15,10 +15,7 @@ export async function POST(req: Request) {
   try {
     body = await req.json()
   } catch {
-    return NextResponse.json(
-      { error: 'Invalid JSON body' },
-      { status: 400 }
-    )
+    return NextResponse.json({ error: 'Invalid request body.' }, { status: 400 })
   }
 
   const parsed = schema.safeParse(body)
@@ -33,11 +30,9 @@ export async function POST(req: Request) {
   const normalized = email.toLowerCase().trim()
 
   try {
-    const user = await db.user.findUnique({
-      where: { email: normalized },
-    })
+    const user = await db.user.findUnique({ where: { email: normalized } })
 
-    if (!user?.passwordHash) {
+    if (!user || !user.passwordHash) {
       return NextResponse.json(
         { error: 'Invalid email or password.' },
         { status: 401 }

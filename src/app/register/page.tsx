@@ -11,31 +11,33 @@ export default function RegisterPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
+  const [alreadyExists, setAlreadyExists] = useState(false)
   const [loading, setLoading] = useState(false)
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError(null)
+    setAlreadyExists(false)
     setLoading(true)
     try {
-      const emailNorm = email.trim().toLowerCase()
       const res = await fetch('/api/auth/register', {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          email: emailNorm,
+          email: email.trim().toLowerCase(),
           password,
         }),
       })
-      const data = (await res.json()) as { error?: string }
+      const data = (await res.json()) as { ok?: boolean; error?: string }
       if (!res.ok) {
-        setError(data.error ?? 'Registration failed')
+        if (res.status === 409) setAlreadyExists(true)
+        setError(data.error ?? 'Registration failed.')
         return
       }
       window.location.assign('/dashboard')
     } catch {
-      setError('Something went wrong. Try again.')
+      setError('Network error. Check your connection and try again.')
     } finally {
       setLoading(false)
     }
@@ -85,17 +87,28 @@ export default function RegisterPage() {
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
+
           {error ? (
-            <p className='text-sm text-red-600' role='alert'>
-              {error}
-            </p>
+            <div className='space-y-1'>
+              <p className='text-sm text-red-600' role='alert'>
+                {error}
+              </p>
+              {alreadyExists ? (
+                <p className='text-sm text-zinc-600'>
+                  <Link
+                    href={`/sign-in?email=${encodeURIComponent(email.trim().toLowerCase())}`}
+                    className='font-medium text-blue-600 underline-offset-2 hover:underline'>
+                    Sign in instead
+                  </Link>
+                </p>
+              ) : null}
+            </div>
           ) : null}
+
           <button
             type='submit'
             disabled={loading}
-            className={buttonVariants({
-              className: 'w-full',
-            })}>
+            className={buttonVariants({ className: 'w-full' })}>
             {loading ? (
               <Loader2 className='h-4 w-4 animate-spin' />
             ) : (

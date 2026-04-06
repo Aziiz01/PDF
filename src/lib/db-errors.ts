@@ -74,8 +74,15 @@ export function responseIfPrismaUserError(
 ): NextResponse | null {
   if (err instanceof Prisma.PrismaClientKnownRequestError) {
     if (err.code === 'P2002') {
-      const target = (err.meta?.target as string[] | undefined)?.join(', ')
-      if (target?.includes('email')) {
+      const raw = err.meta?.target
+      // MongoDB stores the index name (e.g. "email_1"), Postgres stores field
+      // names as an array (["email"]). Normalise both to a single string.
+      const target = Array.isArray(raw)
+        ? raw.join(', ')
+        : typeof raw === 'string'
+        ? raw
+        : ''
+      if (target.toLowerCase().includes('email')) {
         return NextResponse.json(
           { error: 'This email is already registered.' },
           { status: 409 }

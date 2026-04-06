@@ -17,9 +17,9 @@ const Navbar = async () => {
   const displayName = user?.name ?? user?.email ?? 'Your Account'
 
   return (
-    <nav className='sticky h-14 inset-x-0 top-0 z-30 w-full border-b border-gray-200 bg-white/75 backdrop-blur-lg transition-all'>
+    <nav className='sticky h-14 inset-x-0 top-0 z-30 w-full border-b border-violet-100 bg-white/80 backdrop-blur-lg transition-all'>
       <MaxWidthWrapper>
-        <div className='flex h-14 items-center justify-between border-b border-zinc-200'>
+        <div className='flex h-14 items-center justify-between'>
           <Link
             href='/'
             className='flex z-40 font-semibold items-center'>
@@ -29,7 +29,7 @@ const Navbar = async () => {
               alt='Logo'
               src='/favicon.ico'
             />
-            <span className='ml-1'>PDFSnap</span>
+            <span className='ml-1.5 text-violet-700'>PDFSnap</span>
           </Link>
 
           <MobileNav isAuth={!!user} />

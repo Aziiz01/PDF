@@ -36,7 +36,7 @@ export const POST = async (req: NextRequest) => {
   const openAiKey = await getUserOpenAiApiKey(userId)
   if (!openAiKey) {
     return new Response(
-      'Add your OpenAI API key on the Billing page to chat with your PDFs.',
+      'Add your OpenAI API key to chat with your PDFs.',
       { status: 400 }
     )
   }
