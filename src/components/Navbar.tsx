@@ -4,7 +4,7 @@ import { buttonVariants } from './ui/button'
 import { ArrowRight } from 'lucide-react'
 import UserAccountNav from './UserAccountNav'
 import MobileNav from './MobileNav'
-import Image from 'next/image'
+import { Icons } from './Icons'
 import { getAuthUser } from '@/lib/auth'
 import { getUserSubscriptionPlan } from '@/lib/stripe'
 
@@ -23,12 +23,7 @@ const Navbar = async () => {
           <Link
             href='/'
             className='flex z-40 font-semibold items-center'>
-            <Image
-              height={20}
-              width={20}
-              alt='Logo'
-              src='/favicon.ico'
-            />
+            <Icons.logo className='h-5 w-5' />
             <span className='ml-1.5 text-violet-700'>PDFSnap</span>
           </Link>
 

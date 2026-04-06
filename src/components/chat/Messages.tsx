@@ -7,13 +7,33 @@ import { useContext, useEffect, useRef } from 'react'
 import { ChatContext } from './ChatContext'
 import { useIntersection } from '@mantine/hooks'
 
-interface MessagesProps {
-  fileId: string
+const KEY_PROMPT_MESSAGE = {
+  createdAt: new Date(0).toISOString(),
+  id: 'key-prompt',
+  isUserMessage: false,
+  text: `Your PDF is loaded, indexed, and standing by.\n\nI'm ready to answer questions, surface key insights, decode dense paragraphs, and generally make this document work for you — not the other way around.\n\nOne thing first: I need your **OpenAI API key**. Without it, I'm just a very well-read search box.\n\nType your key below to get started. It begins with \`sk-\`.`,
 }
 
-const Messages = ({ fileId }: MessagesProps) => {
+interface MessagesProps {
+  fileId: string
+  processingError?: string | null
+}
+
+function makeErrorMessage(error: string) {
+  return {
+    createdAt: new Date(1).toISOString(),
+    id: 'processing-error',
+    isUserMessage: false,
+    text: `Ran into a problem while processing this PDF.\n\n${error}\n\nOnce you've sorted that out, head back to your **dashboard** and upload the file again — I'll be here.`,
+  }
+}
+
+const Messages = ({ fileId, processingError }: MessagesProps) => {
   const { isLoading: isAiThinking } =
     useContext(ChatContext)
+
+  const { data: ai } = trpc.getAiProviderSettings.useQuery()
+  const hasOpenAiKey = ai?.hasOpenAiKey
 
   const { data, isLoading, fetchNextPage } =
     trpc.getFileMessages.useInfiniteQuery(
@@ -46,6 +66,8 @@ const Messages = ({ fileId }: MessagesProps) => {
   const combinedMessages = [
     ...(isAiThinking ? [loadingMessage] : []),
     ...(messages ?? []),
+    ...(processingError && !isLoading ? [makeErrorMessage(processingError)] : []),
+    ...(!hasOpenAiKey && !processingError && !isLoading ? [KEY_PROMPT_MESSAGE] : []),
   ]
 
   const lastMessageRef = useRef<HTMLDivElement>(null)

@@ -43,9 +43,6 @@ export async function POST(req: Request) {
   const id = crypto.randomUUID()
 
   try {
-    // Attempt to create the user directly.
-    // This is the authoritative uniqueness check — the DB constraint
-    // is the only reliable source of truth.
     await db.user.create({
       data: { id, email: normalized, passwordHash },
     })
